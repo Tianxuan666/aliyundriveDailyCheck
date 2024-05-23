@@ -7,7 +7,8 @@
  * @From: https://github.com/whyour/qinglong/issues/1369
  */
 const axios = require('axios')
-const QL_URL = 'http://127.0.0.1:5700'
+const QL_PATH = process.env.QL_PATH?process.env.QL_PATH:''
+const QL_URL = `http://127.0.0.1:5700${QL_PATH}`
 const CLIENT_ID = process.env.CLIENT_ID
 const CLIENT_SECRET = process.env.CLIENT_SECRET
 
@@ -15,7 +16,7 @@ const CLIENT_SECRET = process.env.CLIENT_SECRET
  *获取青龙token
  */
 function getQLToken() {
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     axios
       .get(
         QL_URL +
@@ -24,6 +25,8 @@ function getQLToken() {
       .then(res => {
         if (res.data.code === 200) {
           resolve(res.data.data.token)
+        } else {
+          reject(res.data.message)
         }
       })
   })
@@ -82,7 +85,7 @@ function getQLEnvs(instance, searchValue = 'JD_COOKIE') {
         }
       })
       .then(res => {
-        resolve(res.data.data)
+        resolve(res.data.data.filter(v => v.status === 0))
       })
   })
 }
